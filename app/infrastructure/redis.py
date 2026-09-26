@@ -4,8 +4,8 @@ from redis.asyncio import Redis
 class RedisClient:
     """Cliente async de Redis.
 
-    En fases posteriores guarda ventanas de rate limit y estado efímero
-    del circuit breaker. Hoy solo demuestra que el canal está abierto.
+    Guarda la cuota por cliente, el estado del circuit breaker y la
+    bitácora corta de fichas generadas.
     """
 
     def __init__(self, url: str) -> None:

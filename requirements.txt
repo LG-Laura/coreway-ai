@@ -4,3 +4,4 @@ pydantic-settings>=2.6,<3
 sqlalchemy[asyncio]>=2.0,<3
 asyncpg>=0.30,<1
 redis>=5.2,<6
+tenacity>=9,<10

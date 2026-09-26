@@ -15,6 +15,12 @@ services:
       API_PREFIX: /api/v1
       DATABASE_URL: postgresql+asyncpg://coreway:coreway@postgres:5432/coreway
       REDIS_URL: redis://redis:6379/0
+      AI_PROVIDER: local
+      RATE_LIMIT_REQUESTS: 10
+      RATE_LIMIT_WINDOW_SECONDS: 60
+      CIRCUIT_FAILURE_THRESHOLD: 3
+      CIRCUIT_RECOVERY_SECONDS: 15
+      AI_RETRY_ATTEMPTS: 2
     volumes:
       # El código del host reemplaza el de la imagen para ver cambios sin rebuild.
       - ./app:/app/app

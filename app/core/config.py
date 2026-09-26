@@ -20,6 +20,13 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+asyncpg://coreway:coreway@localhost:5432/coreway"
     redis_url: str = "redis://localhost:6379/0"
+    ai_provider: str = "local"
+
+    rate_limit_requests: int = 10
+    rate_limit_window_seconds: int = 60
+    circuit_failure_threshold: int = 3
+    circuit_recovery_seconds: int = 15
+    ai_retry_attempts: int = 2
 
 
 @lru_cache
