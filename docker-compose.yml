@@ -1,0 +1,56 @@
+# Un comando levanta el gateway y sus dos dependencias de estado.
+# La API espera a que Postgres y Redis pasen el healthcheck: si arrancara
+# antes, el lifespan fallaría al primer ping y el contenedor entraría en bucle.
+
+services:
+  api:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      APP_NAME: Coreway AI Gateway
+      APP_ENV: local
+      LOG_LEVEL: INFO
+      API_PREFIX: /api/v1
+      DATABASE_URL: postgresql+asyncpg://coreway:coreway@postgres:5432/coreway
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      # El código del host reemplaza el de la imagen para ver cambios sin rebuild.
+      - ./app:/app/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: coreway
+      POSTGRES_PASSWORD: coreway
+      POSTGRES_DB: coreway
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coreway -d coreway"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    # Sin volumen a propósito: las cuotas y el estado efímero se reinician
+    # con el contenedor. El dato de negocio vivirá en Postgres.
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:
